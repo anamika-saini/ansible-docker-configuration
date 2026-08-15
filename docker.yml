@@ -1,0 +1,38 @@
+---
+- name: Deploy Docker application
+  hosts: webserver
+  become: true
+
+  tasks:
+
+    - name: Update apt package index
+      ansible.builtin.apt:
+        update_cache: true
+
+    - name: Install Docker
+      ansible.builtin.apt:
+        name: docker.io
+        state: present
+
+    - name: Start Docker service
+      ansible.builtin.service:
+        name: docker
+        state: started
+        enabled: true
+
+    - name: Pull application image
+      community.docker.docker_image:
+        name: sainianamika/ansible-docker-app
+        tag: v2
+        source: pull
+        force_source: true
+
+    - name: Run application container
+      community.docker.docker_container:
+        name: ansible-docker-app
+        image: sainianamika/ansible-docker-app:v2
+        state: started
+        restart_policy: unless-stopped
+        recreate: true
+        ports:
+          - "80:80"

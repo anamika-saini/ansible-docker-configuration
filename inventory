@@ -1,0 +1,2 @@
+[webserver]
+ec2 ansible_host=13.211.125.55 ansible_user=ubuntu ansible_ssh_private_key_file=~/ansible-key.pem
