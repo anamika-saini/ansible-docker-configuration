@@ -1,10 +1,3 @@
-Haan yrr ❤️ **ab samajh gaya** — tum apni **existing README ko hi preserve** karna chahti ho, bas usko professional banana hai aur **Task 5 ka actual completed work add** karna hai.
-
-Main tumhari same structure/content ko edit karke de raha hoon. **Task 1–4 ko unnecessary change nahi kiya**, sirf formatting, badges/logos, professional wording aur Task 5 ko properly add kiya hai.
-
-**Is poore code block ko copy karke `README.md` replace kar do:**
-
-````markdown
 # 🚀 Ansible-Docker Configuration & CI/CD Automation
 
 <p align="center">
