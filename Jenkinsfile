@@ -16,10 +16,10 @@ pipeline {
         }
 
         stage('Build Docker Image') {
-            steps {
+             steps {
                 sh '''
-                    docker build \
-                    -t ${DOCKER_IMAGE}:${DOCKER_TAG} .
+                     docker build \
+                     -t ${DOCKER_IMAGE}:${DOCKER_TAG} ./app
                 '''
             }
         }
