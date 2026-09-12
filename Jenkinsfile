@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_IMAGE = 'instantprachi/ansible-docker'
+        DOCKER_IMAGE = 'sainianamika/ansible-docker-app'
         DOCKER_TAG = 'latest'
     }
 
