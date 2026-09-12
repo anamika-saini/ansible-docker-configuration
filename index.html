@@ -3,13 +3,762 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Anamika - Docker Compose</title>
+
+    <title>CloudOps Deployment Dashboard</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg: #f4f7fb;
+            --card: rgba(255,255,255,0.85);
+            --text: #172033;
+            --muted: #667085;
+            --border: #e4e7ec;
+            --primary: #4f46e5;
+            --primary-dark: #3730a3;
+            --success: #16a34a;
+            --success-bg: #dcfce7;
+            --shadow: 0 15px 40px rgba(15, 23, 42, 0.08);
+        }
+
+        body.dark {
+            --bg: #0b1120;
+            --card: rgba(17, 24, 39, 0.88);
+            --text: #f8fafc;
+            --muted: #94a3b8;
+            --border: #263247;
+            --primary: #818cf8;
+            --primary-dark: #6366f1;
+            --success: #4ade80;
+            --success-bg: rgba(34,197,94,0.15);
+            --shadow: 0 15px 40px rgba(0,0,0,0.3);
+        }
+
+        body {
+            font-family: Inter, Arial, sans-serif;
+            background:
+                radial-gradient(circle at top left, rgba(79,70,229,0.12), transparent 35%),
+                var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            transition: 0.3s ease;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .container {
+            width: min(1200px, 92%);
+            margin: auto;
+        }
+
+        /* NAVBAR */
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 22px 0;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 20px;
+            font-weight: 800;
+        }
+
+        .brand-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            display: grid;
+            place-items: center;
+            background: linear-gradient(135deg, var(--primary), #06b6d4);
+            color: white;
+            font-size: 21px;
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .theme-btn {
+            border: 1px solid var(--border);
+            background: var(--card);
+            color: var(--text);
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 18px;
+        }
+
+        /* HERO */
+
+        .hero {
+            margin-top: 25px;
+            padding: 45px;
+            border-radius: 28px;
+            background:
+                linear-gradient(135deg, rgba(79,70,229,0.96), rgba(6,182,212,0.90));
+            color: white;
+            box-shadow: var(--shadow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::after {
+            content: "";
+            position: absolute;
+            width: 280px;
+            height: 280px;
+            border-radius: 50%;
+            border: 45px solid rgba(255,255,255,0.08);
+            right: -90px;
+            top: -100px;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 13px;
+            border-radius: 30px;
+            background: rgba(255,255,255,0.16);
+            font-size: 13px;
+            margin-bottom: 18px;
+        }
+
+        .live-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #86efac;
+            box-shadow: 0 0 12px #86efac;
+        }
+
+        .hero h1 {
+            font-size: clamp(32px, 5vw, 58px);
+            line-height: 1.05;
+            max-width: 760px;
+            margin-bottom: 16px;
+        }
+
+        .hero p {
+            max-width: 720px;
+            color: rgba(255,255,255,0.86);
+            line-height: 1.7;
+            font-size: 16px;
+        }
+
+        .hero-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 25px;
+        }
+
+        .btn {
+            padding: 12px 18px;
+            border-radius: 12px;
+            font-weight: 700;
+            transition: 0.25s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn-white {
+            background: white;
+            color: #3730a3;
+        }
+
+        .btn-outline {
+            border: 1px solid rgba(255,255,255,0.4);
+            color: white;
+            background: rgba(255,255,255,0.08);
+        }
+
+        /* SECTION */
+
+        .section {
+            margin-top: 42px;
+        }
+
+        .section-title {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 18px;
+        }
+
+        .section-title h2 {
+            font-size: 23px;
+        }
+
+        .section-title span {
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        /* CARDS */
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 18px;
+        }
+
+        .card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 22px;
+            box-shadow: var(--shadow);
+            backdrop-filter: blur(12px);
+            transition: 0.25s;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 13px;
+            display: grid;
+            place-items: center;
+            background: rgba(79,70,229,0.12);
+            margin-bottom: 17px;
+            font-size: 20px;
+        }
+
+        .card-label {
+            color: var(--muted);
+            font-size: 13px;
+            margin-bottom: 7px;
+        }
+
+        .card-value {
+            font-size: 18px;
+            font-weight: 800;
+            word-break: break-word;
+        }
+
+        .status {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 6px 10px;
+            border-radius: 20px;
+            background: var(--success-bg);
+            color: var(--success);
+            font-size: 12px;
+            font-weight: 800;
+        }
+
+        /* PIPELINE */
+
+        .pipeline {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+            align-items: center;
+        }
+
+        .pipeline-step {
+            text-align: center;
+            position: relative;
+        }
+
+        .pipeline-icon {
+            width: 60px;
+            height: 60px;
+            margin: auto;
+            border-radius: 50%;
+            display: grid;
+            place-items: center;
+            background: var(--success-bg);
+            font-size: 24px;
+            border: 2px solid rgba(34,197,94,0.25);
+        }
+
+        .pipeline-step strong {
+            display: block;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+
+        .pipeline-step small {
+            display: block;
+            color: var(--muted);
+            margin-top: 5px;
+        }
+
+        /* INFO GRID */
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1.3fr 1fr;
+            gap: 20px;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+            padding: 14px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+        .info-key {
+            color: var(--muted);
+        }
+
+        .info-value {
+            font-weight: 700;
+            text-align: right;
+            word-break: break-word;
+        }
+
+        /* TECHNOLOGIES */
+
+        .tech-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .tech {
+            padding: 10px 13px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 700;
+            background: rgba(255,255,255,0.03);
+        }
+
+        /* FOOTER */
+
+        footer {
+            margin-top: 50px;
+            padding: 28px 0;
+            border-top: 1px solid var(--border);
+            color: var(--muted);
+            text-align: center;
+            font-size: 13px;
+        }
+
+        .clock {
+            margin-top: 7px;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        /* RESPONSIVE */
+
+        @media (max-width: 900px) {
+            .grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .pipeline {
+                grid-template-columns: 1fr;
+                gap: 18px;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .hero {
+                padding: 30px 22px;
+            }
+
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+            .hero h1 {
+                font-size: 36px;
+            }
+
+            .info-row {
+                flex-direction: column;
+                gap: 5px;
+            }
+
+            .info-value {
+                text-align: left;
+            }
+        }
+    </style>
 </head>
+
 <body>
-    <h1>Docker Compose is Working!</h1>
-    <p>This static website is running with Nginx.</p>
-    <p>Task 3 - Docker Compose for Multi-Environment</p>
+
+<div class="container">
+
+    <!-- NAVBAR -->
+    <nav>
+        <div class="brand">
+            <div class="brand-icon">☁</div>
+            <span>CloudOps Dashboard</span>
+        </div>
+
+        <div class="nav-right">
+            <button class="theme-btn" onclick="toggleTheme()" title="Toggle theme">
+                🌙
+            </button>
+        </div>
+    </nav>
+
+
+    <!-- HERO -->
+    <section class="hero">
+
+        <div class="hero-content">
+
+            <div class="badge">
+                <span class="live-dot"></span>
+                Production Deployment
+            </div>
+
+            <h1>
+                Automated Cloud Deployment Platform
+            </h1>
+
+            <p>
+                A containerized web application deployed on AWS EC2 using
+                Docker, Terraform, Ansible and Jenkins CI/CD.
+            </p>
+
+            <div class="hero-buttons">
+
+                <a
+                    class="btn btn-white"
+                    href="https://github.com/anamika-saini/ansible-docker-configuration"
+                    target="_blank">
+                    💻 GitHub
+                </a>
+
+                <a
+                    class="btn btn-outline"
+                    href="https://hub.docker.com/r/sainianamika/ansible-docker-app"
+                    target="_blank">
+                    🐳 Docker Hub
+                </a>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- OVERVIEW -->
+    <section class="section">
+
+        <div class="section-title">
+            <h2>Deployment Overview</h2>
+            <span>Current environment</span>
+        </div>
+
+        <div class="grid">
+
+            <div class="card">
+                <div class="card-icon">☁️</div>
+                <div class="card-label">Cloud Platform</div>
+                <div class="card-value">AWS EC2</div>
+            </div>
+
+            <div class="card">
+                <div class="card-icon">🐳</div>
+                <div class="card-label">Container</div>
+                <div class="card-value">Docker</div>
+            </div>
+
+            <div class="card">
+                <div class="card-icon">🔄</div>
+                <div class="card-label">CI/CD</div>
+                <div class="card-value">Jenkins</div>
+            </div>
+
+            <div class="card">
+                <div class="card-icon">🟢</div>
+                <div class="card-label">Application Status</div>
+                <div class="card-value">
+                    <span class="status">● LIVE</span>
+                </div>
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- PIPELINE -->
+    <section class="section">
+
+        <div class="section-title">
+            <h2>CI/CD Pipeline</h2>
+            <span>Deployment workflow</span>
+        </div>
+
+        <div class="card">
+
+            <div class="pipeline">
+
+                <div class="pipeline-step">
+                    <div class="pipeline-icon">💻</div>
+                    <strong>GitHub</strong>
+                    <small>Source Code</small>
+                </div>
+
+                <div class="pipeline-step">
+                    <div class="pipeline-icon">🔨</div>
+                    <strong>Jenkins</strong>
+                    <small>Build</small>
+                </div>
+
+                <div class="pipeline-step">
+                    <div class="pipeline-icon">🐳</div>
+                    <strong>Docker</strong>
+                    <small>Container</small>
+                </div>
+
+                <div class="pipeline-step">
+                    <div class="pipeline-icon">📦</div>
+                    <strong>Docker Hub</strong>
+                    <small>Image Registry</small>
+                </div>
+
+                <div class="pipeline-step">
+                    <div class="pipeline-icon">☁️</div>
+                    <strong>AWS EC2</strong>
+                    <small>Deployment</small>
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- DETAILS -->
+    <section class="section">
+
+        <div class="section-title">
+            <h2>Infrastructure Details</h2>
+            <span>Deployment configuration</span>
+        </div>
+
+        <div class="info-grid">
+
+            <div class="card">
+
+                <div class="info-row">
+                    <span class="info-key">Cloud Provider</span>
+                    <span class="info-value">Amazon Web Services</span>
+                </div>
+
+                <div class="info-row">
+                    <span class="info-key">Service</span>
+                    <span class="info-value">EC2</span>
+                </div>
+
+                <div class="info-row">
+                    <span class="info-key">Region</span>
+                    <span class="info-value">ap-southeast-2</span>
+                </div>
+
+                <div class="info-row">
+                    <span class="info-key">Instance Type</span>
+                    <span class="info-value">t4g.micro</span>
+                </div>
+
+                <div class="info-row">
+                    <span class="info-key">Web Server</span>
+                    <span class="info-value">Nginx</span>
+                </div>
+
+                <div class="info-row">
+                    <span class="info-key">Application Port</span>
+                    <span class="info-value">8080 → 80</span>
+                </div>
+
+            </div>
+
+
+            <div class="card">
+
+                <div class="info-row">
+                    <span class="info-key">Docker Image</span>
+                    <span class="info-value">
+                        sainianamika/ansible-docker-app
+                    </span>
+                </div>
+
+                <div class="info-row">
+                    <span class="info-key">Image Tag</span>
+                    <span class="info-value">latest</span>
+                </div>
+
+                <div class="info-row">
+                    <span class="info-key">Jenkins Job</span>
+                    <span class="info-value">ansible-docker-pipeline</span>
+                </div>
+
+                <div class="info-row">
+                    <span class="info-key">Latest Build</span>
+                    <span class="info-value">#14 — SUCCESS</span>
+                </div>
+
+                <div class="info-row">
+                    <span class="info-key">Deployment</span>
+                    <span class="info-value">Production</span>
+                </div>
+
+                <div class="info-row">
+                    <span class="info-key">Status</span>
+                    <span class="info-value">
+                        <span class="status">● Healthy</span>
+                    </span>
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- TECHNOLOGIES -->
+    <section class="section">
+
+        <div class="section-title">
+            <h2>Technology Stack</h2>
+            <span>Project components</span>
+        </div>
+
+        <div class="card">
+
+            <div class="tech-list">
+
+                <span class="tech">☁ AWS EC2</span>
+                <span class="tech">🐧 Linux</span>
+                <span class="tech">🐳 Docker</span>
+                <span class="tech">🔧 Ansible</span>
+                <span class="tech">🏗 Terraform</span>
+                <span class="tech">🔄 Jenkins</span>
+                <span class="tech">📦 Docker Hub</span>
+                <span class="tech">💻 GitHub</span>
+                <span class="tech">🌐 Nginx</span>
+                <span class="tech">📜 Bash</span>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- FOOTER -->
+    <footer>
+
+        <strong>CloudOps Deployment Dashboard</strong>
+
+        <div class="clock" id="clock"></div>
+
+        <p style="margin-top:8px;">
+            Built as part of DevOps Internship Project
+        </p>
+
+    </footer>
+
+</div>
+
+
+<script>
+
+    // DARK / LIGHT MODE
+
+    function toggleTheme() {
+
+        document.body.classList.toggle("dark");
+
+        const button = document.querySelector(".theme-btn");
+
+        if (document.body.classList.contains("dark")) {
+            button.innerHTML = "☀️";
+            localStorage.setItem("theme", "dark");
+        } else {
+            button.innerHTML = "🌙";
+            localStorage.setItem("theme", "light");
+        }
+    }
+
+
+    // REMEMBER THEME
+
+    if (localStorage.getItem("theme") === "dark") {
+        document.body.classList.add("dark");
+        document.querySelector(".theme-btn").innerHTML = "☀️";
+    }
+
+
+    // LIVE CLOCK
+
+    function updateClock() {
+
+        const now = new Date();
+
+        const date = now.toLocaleDateString("en-IN", {
+            weekday: "short",
+            day: "2-digit",
+            month: "short",
+            year: "numeric"
+        });
+
+        const time = now.toLocaleTimeString("en-IN");
+
+        document.getElementById("clock").innerText =
+            date + " • " + time;
+    }
+
+    updateClock();
+
+    setInterval(updateClock, 1000);
+
+</script>
+
 </body>
-</html><--show-keys --with-fingerprint webhook test -->
-<--show-keys --with-fingerprint Jenkins webhook test -->
-<--show-keys --with-fingerprint webhook retry -->
+</html>
